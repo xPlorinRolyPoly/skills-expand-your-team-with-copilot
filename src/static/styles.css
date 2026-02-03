@@ -724,6 +724,6 @@ footer {
 }
 
 /* Adjust user controls position when theme toggle is present */
-body #user-controls {
+#user-controls {
   right: 60px;
 }
