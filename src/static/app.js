@@ -309,20 +309,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const formattedSchedule = formatSchedule(details);
     const spotsLeft = details.max_participants - details.participants.length;
     
-    const shareText = `Check out this activity at Mergington High School: ${name}! ${details.description} Schedule: ${formattedSchedule}. ${spotsLeft} spots left!`;
+    // Sanitize text to prevent injection issues
+    const sanitize = (text) => text.replace(/[<>]/g, '');
+    
+    const shareText = `Check out this activity at Mergington High School: ${sanitize(name)}! ${sanitize(details.description)} Schedule: ${formattedSchedule}. ${spotsLeft} spots left!`;
     const shareUrl = window.location.href;
+    
+    // For Twitter, limit to 280 characters (accounting for URL length)
+    const twitterText = shareText.length > 240 ? shareText.substring(0, 237) + '...' : shareText;
     
     return {
       text: shareText,
+      twitterText: twitterText,
       url: shareUrl,
-      title: `${name} - Mergington High School Activities`
+      title: `${sanitize(name)} - Mergington High School Activities`
     };
   }
 
   // Function to handle social sharing
   function handleShare(platform, name, details) {
     const shareContent = createShareContent(name, details);
-    const encodedText = encodeURIComponent(shareContent.text);
     const encodedUrl = encodeURIComponent(shareContent.url);
     const encodedTitle = encodeURIComponent(shareContent.title);
     
@@ -333,13 +339,15 @@ document.addEventListener("DOMContentLoaded", () => {
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
         break;
       case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
+        const encodedTwitterText = encodeURIComponent(shareContent.twitterText);
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodedTwitterText}`;
         break;
       case 'linkedin':
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
         break;
       case 'email':
-        shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedText}`;
+        const encodedEmailText = encodeURIComponent(shareContent.text);
+        shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedEmailText}`;
         break;
       default:
         return;
@@ -602,17 +610,17 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="share-buttons">
         <span class="share-label">Share:</span>
-        <button class="share-button facebook" data-platform="facebook" data-activity="${name}" title="Share on Facebook">
-          <span class="share-icon">f</span>
+        <button class="share-button facebook" data-platform="facebook" data-activity="${name}" title="Share on Facebook" aria-label="Share ${name} on Facebook">
+          <span class="share-icon" aria-hidden="true">f</span>
         </button>
-        <button class="share-button twitter" data-platform="twitter" data-activity="${name}" title="Share on Twitter">
-          <span class="share-icon">🐦</span>
+        <button class="share-button twitter" data-platform="twitter" data-activity="${name}" title="Share on Twitter" aria-label="Share ${name} on Twitter">
+          <span class="share-icon" aria-hidden="true">𝕏</span>
         </button>
-        <button class="share-button linkedin" data-platform="linkedin" data-activity="${name}" title="Share on LinkedIn">
-          <span class="share-icon">in</span>
+        <button class="share-button linkedin" data-platform="linkedin" data-activity="${name}" title="Share on LinkedIn" aria-label="Share ${name} on LinkedIn">
+          <span class="share-icon" aria-hidden="true">in</span>
         </button>
-        <button class="share-button email" data-platform="email" data-activity="${name}" title="Share via Email">
-          <span class="share-icon">✉</span>
+        <button class="share-button email" data-platform="email" data-activity="${name}" title="Share via Email" aria-label="Share ${name} via Email">
+          <span class="share-icon" aria-hidden="true">@</span>
         </button>
       </div>
       <div class="activity-card-actions">
