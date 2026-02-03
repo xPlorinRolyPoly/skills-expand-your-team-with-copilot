@@ -535,8 +535,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </span>
     `;
 
-    // Create difficulty tag if present
-    const difficultyTagHtml = details.difficulty ? `
+    // Create difficulty tag if present (sanitize by only allowing expected values)
+    const allowedDifficulties = ['Beginner', 'Intermediate', 'Advanced'];
+    const difficultyTagHtml = details.difficulty && allowedDifficulties.includes(details.difficulty) ? `
       <span class="difficulty-tag difficulty-${details.difficulty.toLowerCase()}">
         ${details.difficulty}
       </span>
